@@ -1,0 +1,32 @@
+services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  flask:
+    build: ./app
+    environment:
+      DB_HOST: db
+      DB_NAME: appdb
+      DB_USER: user
+      DB_PASS: password
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - flask
+
+volumes:
+  pgdata:
